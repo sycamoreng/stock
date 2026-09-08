@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   GCP_PROJECT_ID: single-planet-281907
   IMAGE_NAME: sycamore-stocks
@@ -26,15 +29,12 @@ jobs:
         id: tag
         run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
-
       - name: Auth to GCP
         run: |
           echo "${{ secrets.SERVICE_ACCOUNT }}" | base64 -d > sa.json
           gcloud auth activate-service-account --key-file sa.json
           gcloud auth configure-docker gcr.io --quiet
-          rm -f sa.json
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -47,39 +47,48 @@ jobs:
             -t gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:latest \
             .
 
+      - name: Download Trivy HTML template
+        run: |
+          curl -sfL -o trivy-html.tpl \
+            https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
+
       - name: Trivy image scan
         id: trivy_image
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
           image-ref: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-          format: template
-          template: '@/contrib/html.tpl'
-          output: trivy-image-report.html
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          vuln-type: os,library
           ignore-unfixed: true
+          exit-code: 1
+          format: template
+          template: "@trivy-html.tpl"
+          output: trivy-image-report.html
+          trivyignores: .trivyignore
 
       - name: Trivy filesystem scan
         id: trivy_fs
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
           scan-type: fs
           scan-ref: .
-          format: template
-          template: '@/contrib/html.tpl'
-          output: trivy-fs-report.html
           severity: HIGH,CRITICAL
-          exit-code: '1'
+          vuln-type: os,library
           ignore-unfixed: true
+          exit-code: 1
+          format: template
+          template: "@trivy-html.tpl"
+          output: trivy-fs-report.html
+          trivyignores: .trivyignore
 
       - name: Upload scan reports to Slack
         if: always()
         uses: MeilCli/slack-upload-file@v4
         with:
-          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channels: ${{ secrets.SLACK_CHANNEL }}
+          slack_token: ${{ secrets.SLACK_TOKEN }}
+          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
           file_path: 'trivy-*.html'
           initial_comment: |
             *stocks* build `${{ steps.tag.outputs.tag }}`
@@ -114,8 +123,14 @@ jobs:
 
       - name: Install kustomize
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          KUSTOMIZE_VERSION=5.4.3
+          KUSTOMIZE_SHA256=<paste real sha256 from checksums.txt on the release page>
+          curl -sSL -o kustomize.tar.gz \
+            "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          echo "${KUSTOMIZE_SHA256}  kustomize.tar.gz" | sha256sum -c -
+          tar -xzf kustomize.tar.gz
           sudo mv kustomize /usr/local/bin/
+          kustomize version
 
       - name: Update image tag
         run: |
