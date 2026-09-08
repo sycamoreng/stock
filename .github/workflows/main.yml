@@ -74,6 +74,7 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          scanners: vuln
           severity: HIGH,CRITICAL
           vuln-type: os,library
           ignore-unfixed: true
