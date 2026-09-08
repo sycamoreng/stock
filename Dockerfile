@@ -22,7 +22,7 @@ RUN npm run build
 FROM node:22-alpine AS production
 
 RUN apk update && apk upgrade --no-cache && \
-    apk del --no-cache npm 2>/dev/null || true
+    apk del --no-cache npm
 
 RUN addgroup -g 1994 appgroup && \
     adduser -D -u 1994 -G appgroup appuser
