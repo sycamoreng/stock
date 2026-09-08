@@ -1,0 +1,39 @@
+# Node.js transitive deps from npm/pacote toolchain (nested in node:22-alpine).
+# Not reachable at runtime — Nuxt output is a standalone bundle, npm removed from prod stage.
+# Revisit when a newer node:22-alpine base ships with patched versions.
+
+# brace-expansion — ReDoS
+CVE-2026-13149
+CVE-2026-14257
+CVE-2026-69152
+
+# ip-address — parsing DoS
+CVE-2026-69192
+
+# pacote — arbitrary code exec in git dep handling (npm CLI internal)
+CVE-2026-9496
+
+# picomatch — ReDoS
+CVE-2026-33671
+
+# sigstore — signature verification bypass (npm internal)
+CVE-2026-48815
+
+# tar — path traversal / DoS (npm internal, not used by app)
+CVE-2026-59873
+CVE-2026-59874
+CVE-2026-73566
+
+# Duplicates / extras surfaced by other advisory DBs
+CVE-2026-11822
+CVE-2026-11824
+CVE-2026-54272
+GHSA-23hp-3jrh-7fpw
+GHSA-3jxr-9vmj-r5cp
+GHSA-52v5-jr5w-gjxr
+GHSA-8x88-c5mf-7j5w
+GHSA-c2c7-rcm5-vvqj
+GHSA-mh99-v99m-4gvg
+GHSA-mwp4-54f8-5fhr
+GHSA-r292-9mhp-454m
+GHSA-rgw5-rvv9-x895

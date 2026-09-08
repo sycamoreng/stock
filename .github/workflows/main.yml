@@ -1,0 +1,129 @@
+name: Build, Scan, Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT_ID: single-planet-281907
+  IMAGE_NAME: sycamore-stocks
+  INFRA_REPO: sycamoreng/Infrastructure
+  OVERLAY_PATH: apps/stocks/overlays/production
+
+jobs:
+  build-scan-push:
+    name: Build, scan, push
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image_tag: ${{ steps.tag.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: tag
+        run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Auth to GCP
+        run: |
+          echo "${{ secrets.SERVICE_ACCOUNT }}" | base64 -d > sa.json
+          gcloud auth activate-service-account --key-file sa.json
+          gcloud auth configure-docker gcr.io --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build \
+            --build-arg VITE_SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --build-arg VITE_SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" \
+            -t gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:${{ steps.tag.outputs.tag }} \
+            -t gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:latest \
+            .
+
+      - name: Trivy image scan
+        id: trivy_image
+        uses: aquasecurity/trivy-action@0.35.0
+        continue-on-error: true
+        with:
+          image-ref: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+          format: template
+          template: '@/contrib/html.tpl'
+          output: trivy-image-report.html
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+
+      - name: Trivy filesystem scan
+        id: trivy_fs
+        uses: aquasecurity/trivy-action@0.35.0
+        continue-on-error: true
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: template
+          template: '@/contrib/html.tpl'
+          output: trivy-fs-report.html
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+
+      - name: Upload scan reports to Slack
+        if: always()
+        uses: MeilCli/slack-upload-file@v4
+        with:
+          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channels: ${{ secrets.SLACK_CHANNEL }}
+          file_path: 'trivy-*.html'
+          initial_comment: |
+            *stocks* build `${{ steps.tag.outputs.tag }}`
+            Image scan: ${{ steps.trivy_image.outcome }}
+            FS scan: ${{ steps.trivy_fs.outcome }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Fail if vulnerabilities found
+        if: steps.trivy_image.outcome == 'failure' || steps.trivy_fs.outcome == 'failure'
+        run: |
+          echo "::error::HIGH or CRITICAL vulnerabilities found. Deploy blocked."
+          exit 1
+
+      - name: Push image
+        run: |
+          docker push gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:${{ steps.tag.outputs.tag }}
+          docker push gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:latest
+
+  update-infra-repo:
+    name: Update infra overlay
+    needs: build-scan-push
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout infra repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.INFRA_REPO }}
+          token: ${{ secrets.INFRA_REPO_TOKEN }}
+          ref: main
+
+      - name: Install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Update image tag
+        run: |
+          cd $OVERLAY_PATH
+          kustomize edit set image \
+            stocks=gcr.io/$GCP_PROJECT_ID/$IMAGE_NAME:${{ needs.build-scan-push.outputs.image_tag }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add $OVERLAY_PATH/kustomization.yml
+          git commit -m "stocks: pin production to ${{ needs.build-scan-push.outputs.image_tag }}" || echo "No changes"
+          git push
