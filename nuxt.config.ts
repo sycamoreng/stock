@@ -18,10 +18,19 @@ export default defineNuxtConfig({
         },
       ],
       link: [
+        { rel: 'icon', type: 'image/png', href: '/logo-1024.png' },
+        { rel: 'apple-touch-icon', href: '/logo-1024.png' },
         { rel: 'preconnect', href: 'https://api.fontshare.com' },
         {
           rel: 'stylesheet',
           href: 'https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap',
+        },
+      ],
+      script: [
+        { src: 'https://www.googletagmanager.com/gtag/js?id=AW-17637675490', async: true },
+        {
+          innerHTML:
+            "window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'AW-17637675490');",
         },
       ],
     },

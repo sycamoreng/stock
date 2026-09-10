@@ -115,6 +115,18 @@ header{
   .nav-actions .btn{ display:none; }
   .burger{ display:block; }
 }
+@media (max-width: 900px){
+  header{ background:#fff; backdrop-filter:none; }
+}
+@media (max-width: 560px){
+  .nav{ padding:10px 18px; }
+  .logo-img{ height:22px; }
+  .mobile-panel{ background:#fff; padding:18px 20px; }
+  .mobile-panel .logo-img{ height:24px; }
+  .mobile-panel ul{ margin:28px 0; gap:18px; }
+  .mobile-panel a{ font-size:18px; font-weight:600; }
+  .mobile-panel .btn-block{ font-size:15px; color:#fff; }
+}
 
 /* ---------- Hero ---------- */
 .hero{
@@ -161,19 +173,25 @@ header{
 .hero-art{ position:relative; aspect-ratio: 1/1; align-self:end; }
 .hero-art-glow{
   position:absolute; inset:6%;
-  background: radial-gradient(circle at 40% 35%, rgba(79,154,99,0.28), rgba(211,162,78,0.14) 55%, transparent 72%);
+  background: radial-gradient(circle at 40% 35%, rgba(96,165,250,0.30), rgba(147,197,253,0.16) 55%, transparent 72%);
   filter: blur(6px);
 }
 .hero-coin{
-  position:relative; width:88%; margin:0 auto; display:block;
+  position:relative; width:88%; max-width:100%; height:auto; margin:0 auto; display:block;
   filter: drop-shadow(0 30px 40px rgba(21,52,85,0.18));
 }
 
 @media (max-width:900px){
-  .hero-grid{ grid-template-columns:1fr; }
-  .hero-art{ order:-1; aspect-ratio:4/3; max-width:300px; margin:0 auto; }
+  .hero{ padding-top:56px; }
+  .hero-grid{ grid-template-columns:1fr; gap:28px; }
+  .hero-art{ order:-1; aspect-ratio:auto; width:100%; max-width:340px; margin:0 auto; }
+  .hero-coin{ width:100%; }
   .hero-ticker{ flex-wrap:wrap; row-gap:18px; }
   .hero-ticker .tick{ flex:1 1 45%; }
+  .hero-ticker .tick + .tick{ border-left:none; padding-left:0; }
+}
+@media (max-width:480px){
+  .hero-art{ max-width:260px; }
 }
 
 /* ---------- Trust bar ---------- */
