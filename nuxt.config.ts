@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   app: {
     head: {
-      title: 'Sycamore Stock: Get Ready Before Launch',
+      title: 'Own a piece of Dangote Refinery — Sycamore',
       htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
@@ -14,15 +14,14 @@ export default defineNuxtConfig({
         {
           name: 'description',
           content:
-            "Complete your verification and trading account setup now, so you can trade Dangote Industries and Nigeria's biggest names the moment Sycamore Stock opens.",
+            'Apply for shares in the Dangote Petroleum Refinery IPO directly from the Sycamore app. Offer price ₦525 per share, minimum ₦5,250. Simple, secure, and built for Nigerians.',
         },
       ],
       link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'preconnect', href: 'https://api.fontshare.com' },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap',
+          href: 'https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap',
         },
       ],
     },
