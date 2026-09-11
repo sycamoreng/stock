@@ -16,6 +16,22 @@ export default defineNuxtConfig({
           content:
             'Apply for shares in the Dangote Petroleum Refinery IPO directly from the Sycamore app. Offer price ₦525 per share, minimum ₦5,250. Simple, secure, and built for Nigerians.',
         },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: 'Own a piece of Dangote Refinery — Sycamore' },
+        {
+          property: 'og:description',
+          content:
+            'Apply for shares in the Dangote Petroleum Refinery IPO directly from the Sycamore app. Offer price ₦525 per share, minimum ₦5,250.',
+        },
+        { property: 'og:image', content: '/feature-image.png' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Own a piece of Dangote Refinery — Sycamore' },
+        {
+          name: 'twitter:description',
+          content:
+            'Apply for shares in the Dangote Petroleum Refinery IPO directly from the Sycamore app. Offer price ₦525 per share, minimum ₦5,250.',
+        },
+        { name: 'twitter:image', content: '/feature-image.png' },
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/logo-1024.png' },
