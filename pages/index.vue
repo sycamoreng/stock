@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const PRICE = 525
 const MIN_SHARES = 10
+const SHARE_STEP = 10
 
 const mobileOpen = ref(false)
 function closeMobile() {
@@ -10,31 +11,35 @@ function closeMobile() {
 function formatNaira(n: number) {
   return '₦' + Math.round(n).toLocaleString('en-NG')
 }
-function parseAmount(val: string) {
+function parseInt10(val: string) {
   const digits = val.replace(/[^0-9]/g, '')
   return digits ? parseInt(digits, 10) : 0
 }
 
-const amountText = ref('50,000')
-const rawAmount = computed(() => parseAmount(amountText.value))
-const shares = computed(() => Math.floor(rawAmount.value / PRICE))
+const sharesText = ref('100')
+const shares = computed(() => parseInt10(sharesText.value))
 const totalCost = computed(() => shares.value * PRICE)
-const warn = computed(() =>
-  rawAmount.value > 0 && shares.value < MIN_SHARES
-    ? 'Below the minimum of 10 shares (₦5,250). Increase your amount to apply.'
-    : '',
-)
+const warn = computed(() => {
+  if (shares.value === 0) return ''
+  if (shares.value < MIN_SHARES) return 'The minimum application is 10 shares.'
+  if (shares.value % SHARE_STEP !== 0) return 'Shares must be bought in multiples of 10.'
+  return ''
+})
 
-function setAmount(v: number) {
-  amountText.value = v.toLocaleString('en-NG')
+function setShares(v: number) {
+  sharesText.value = String(v)
 }
-function onAmountInput(e: Event) {
+function onSharesInput(e: Event) {
   const el = e.target as HTMLInputElement
-  const n = parseAmount(el.value)
-  amountText.value = n ? n.toLocaleString('en-NG') : ''
+  const n = parseInt10(el.value)
+  sharesText.value = n ? String(n) : ''
+}
+function stepShares(delta: number) {
+  const next = Math.max(MIN_SHARES, shares.value + delta)
+  sharesText.value = String(next)
 }
 
-const quickAmounts = [5250, 25000, 100000, 500000]
+const quickShares = [10, 50, 200, 1000]
 
 const faqs = [
   {
@@ -407,23 +412,24 @@ const faqs = [
         <div class="section-head">
           <span class="eyebrow">Investment Calculator</span>
           <h2>See what your investment gets you</h2>
-          <p class="sub">Enter an amount to estimate how many shares it buys at the ₦525 offer price.</p>
+          <p class="sub">Enter the number of shares you'd like to buy to see your total at the ₦525 offer price.</p>
         </div>
         <div class="calc-panel">
           <div class="calc-input-side">
-            <label for="amount">Amount you'd like to invest</label>
+            <label for="shareCount">Number of shares</label>
             <div class="calc-input-wrap">
-              <span class="ngn">₦</span>
+              <button type="button" class="step" aria-label="Decrease shares" @click="stepShares(-SHARE_STEP)">&minus;</button>
               <input
-                id="amount"
+                id="shareCount"
                 type="text"
                 inputmode="numeric"
-                :value="amountText"
-                @input="onAmountInput"
+                :value="sharesText"
+                @input="onSharesInput"
               >
+              <button type="button" class="step" aria-label="Increase shares" @click="stepShares(SHARE_STEP)">+</button>
             </div>
             <div class="calc-quick">
-              <button v-for="q in quickAmounts" :key="q" @click="setAmount(q)">{{ formatNaira(q) }}</button>
+              <button v-for="q in quickShares" :key="q" @click="setShares(q)">{{ q.toLocaleString('en-NG') }} shares</button>
             </div>
             <div class="calc-warn">{{ warn }}</div>
           </div>
@@ -433,7 +439,7 @@ const faqs = [
               <div class="v">{{ shares.toLocaleString('en-NG') }}</div>
             </div>
             <div class="calc-row">
-              <div class="k">Price used</div>
+              <div class="k">Price per share</div>
               <div class="v">₦525.00</div>
             </div>
             <div class="calc-row total">
