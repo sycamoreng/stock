@@ -102,7 +102,7 @@ const faqs = [
           <li><a href="#faq">FAQ</a></li>
         </ul>
         <div class="nav-actions">
-          <a class="btn btn-primary" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener">Apply for the IPO</a>
+          <a class="btn btn-primary" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener">Apply for the IPO</a>
           <button class="burger" aria-label="Open menu" @click="mobileOpen = true">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <path d="M4 7h16M4 12h16M4 17h16" />
@@ -130,7 +130,7 @@ const faqs = [
           <li><a href="#calculator" @click="closeMobile">Calculator</a></li>
           <li><a href="#faq" @click="closeMobile">FAQ</a></li>
         </ul>
-        <a class="btn btn-primary btn-block" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener" @click="closeMobile">Apply for the IPO</a>
+        <a class="btn btn-primary btn-block" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener" @click="closeMobile">Apply for the IPO</a>
       </div>
     </header>
 
@@ -145,7 +145,7 @@ const faqs = [
               world's largest single-train refinery, directly from the Sycamore app.
             </p>
             <div class="hero-cta-row">
-              <a class="btn btn-primary" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener">Apply for the IPO</a>
+              <a class="btn btn-primary" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener">Apply for the IPO</a>
               <a href="#how" class="secondary-link">See how it works</a>
             </div>
             <div class="hero-ticker">
@@ -401,7 +401,7 @@ const faqs = [
           </div>
         </div>
         <div style="text-align:center;margin-top:44px;">
-          <a class="btn btn-primary" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener">Apply for the IPO</a>
+          <a class="btn btn-primary" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener">Apply for the IPO</a>
         </div>
       </div>
     </section>
@@ -447,7 +447,7 @@ const faqs = [
               <div class="v">{{ formatNaira(totalCost) }}</div>
             </div>
             <p class="fine" style="margin-top:18px;">Illustrative only. Final allocation may be scaled back in the event of oversubscription &mdash; see the official prospectus.</p>
-            <a class="btn btn-gold btn-block" style="margin-top:24px;" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener">Apply for these shares</a>
+            <a class="btn btn-gold btn-block" style="margin-top:24px;" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener">Apply for these shares</a>
           </div>
         </div>
       </div>
@@ -499,7 +499,7 @@ const faqs = [
           </div>
         </div>
         <div style="text-align:center;margin-top:44px;">
-          <a class="btn btn-primary" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener">Apply for the IPO</a>
+          <a class="btn btn-primary" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener">Apply for the IPO</a>
         </div>
       </div>
     </section>
@@ -569,7 +569,7 @@ const faqs = [
         <span class="eyebrow">The offer closes 13 October 2026</span>
         <h2>Ready to own a piece of Dangote Refinery?</h2>
         <p>Get verified today, so you're ready the moment the offer opens.</p>
-        <a class="btn btn-gold" href="https://sycamoreng.onelink.me/Qthc/9lrl1bvq" target="_blank" rel="noopener">Apply for the IPO</a>
+        <a class="btn btn-gold" href="https://dashboard.sycamore.ng" target="_blank" rel="noopener">Apply for the IPO</a>
       </div>
     </section>
 
